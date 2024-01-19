@@ -21,16 +21,23 @@ public class Main {
 		}
 
 		Stack<Integer> s = new Stack<>();
+		int index = 0;
 		int[] result = new int[N];
 
-		for (int i = 0; i < N; i++) {
-			while (!s.empty() && number[s.peek()] < number[i]) {
-				result[s.pop()] = number[i];
+		while (index < N) {
+			if (s.size() == 0) {
+				s.add(index);
+				index = index + 1;
+			} else {
+				while (s.size() != 0 && number[s.peek()] < number[index]) {
+					result[s.pop()] = number[index];
+				}
+				s.add(index);
+				index = index + 1;
 			}
-			s.push(i);
 		}
 
-		while (!s.empty()) {
+		while (s.size() > 0) {
 			result[s.pop()] = -1;
 		}
 
