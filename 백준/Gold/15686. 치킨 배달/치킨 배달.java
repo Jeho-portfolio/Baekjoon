@@ -1,68 +1,85 @@
+import java.io.*;
 import java.util.*;
- 
+
 public class Main {
- 
-    static int n, m;
-    static int[][] board;
-    static int min = Integer.MAX_VALUE;
-    static ArrayList<Node> chickenList = new ArrayList<>(); //치킨집 위치를 저장하는 리스트 
-    static ArrayList<Node> houseList = new ArrayList<>(); // 집의 위치를 저장하는 리스트
-    static boolean[] chickenVisited; // 뽑은 치킨집 체크
-    
-    public static void main(String[] args) {
-        Scanner scan = new Scanner(System.in);
- 
-        n = scan.nextInt();
-        m = scan.nextInt();
-        
-        board = new int[n][n];
-        for(int i = 0; i < n; i++) {
-            for(int j = 0; j < n; j++) {
-                board[i][j] = scan.nextInt();
-                if(board[i][j] == 1) houseList.add(new Node(i, j));
-                else if(board[i][j] == 2) chickenList.add(new Node(i, j));
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+
+    static int N, M, length = Integer.MAX_VALUE;
+    static int[][] field;
+    static ArrayList<Point> house = new ArrayList<>();
+    static ArrayList<Point> chicken = new ArrayList<>();
+    static boolean[] visited;
+
+    public static void main(String[] args) throws IOException {
+        String str = br.readLine();
+        StringTokenizer st = new StringTokenizer(str);
+
+        N = Integer.parseInt(st.nextToken());
+        M = Integer.parseInt(st.nextToken());
+
+        field = new int[N + 1][N + 1];
+        for (int i = 1; i <= N; i++) {
+            str = br.readLine();
+            st = new StringTokenizer(str);
+            for (int j = 1; j <= N; j++) {
+                field[i][j] = Integer.parseInt(st.nextToken());
+                if (field[i][j] == 1) {
+                    house.add(new Point(i, j));
+                } else if (field[i][j] == 2) {
+                    chicken.add(new Point(i, j));
+                }
             }
         }
         
-        chickenVisited = new boolean[chickenList.size()];
-        backtracking(0, 0); //m개의 치킨집을 뽑는다.
-        System.out.println(min);
+        visited = new boolean[chicken.size()];
+
+        sequence(0, 0);
+
+        bw.write(String.valueOf(length));
+
+        br.close();
+        bw.close();
     }
-    
-    public static void backtracking(int count, int idx) {
-        if(count == m) { //치킨 거리의 최솟값을 구한다.
-            int total = 0; // 도시의 치킨거리
-            for(int i = 0; i < houseList.size(); i++) {
-                int sum = Integer.MAX_VALUE;
-                for(int j = 0; j < chickenList.size(); j++) {
-                    if(chickenVisited[j] == true) { //i번째 집에서부터 j번짜 치킨집 까지의 거리 중 최소값을 구한다.
-                        int dist = Math.abs(houseList.get(i).x - chickenList.get(j).x) 
-                                + Math.abs(houseList.get(i).y - chickenList.get(j).y);
-                        sum = Math.min(sum, dist);
-                    }
+
+    static void sequence(int count, int k) throws IOException {
+        if (count == M) {
+            int sum = 0;
+            for (int index = 0; index < house.size(); index++) {
+                int l = Integer.MAX_VALUE;
+                for (int i = 0; i < chicken.size(); i++) {
+                	if(visited[i]) {
+                		int tmp = Math.abs(house.get(index).x - chicken.get(i).x) + Math.abs(house.get(index).y - chicken.get(i).y);
+                        if (tmp < l) {
+                            l = tmp;
+                        }	
+                	}                	
                 }
-                total += sum;
+                sum = sum + l;
             }
-            min = Math.min(total, min);
+
+            if (sum < length) {
+                length = sum;
+            }
             return;
         }
-        
-        for(int i = idx; i < chickenList.size(); i++) {
-            if(chickenVisited[i] == false) {
-                chickenVisited[i] = true;
-                backtracking(count + 1, i + 1);
-                chickenVisited[i] = false;
+
+        for (int i = k; i < chicken.size(); i++) {
+            if (!visited[i]) {
+                visited[i] = true;
+                sequence(count + 1, i + 1);
+                visited[i] = false;
             }
         }
     }
-    
-    public static class Node {
-        int x;
-        int y;
-        
-        public Node(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
+}
+
+class Point {
+    int x;
+    int y;
+
+    Point(int f, int s) {
+        x = f;
+        y = s;
     }
 }
