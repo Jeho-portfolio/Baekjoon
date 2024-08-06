@@ -15,8 +15,14 @@ public class Main {
 		long H = 0;
 		for (int i = 0; i < L; i++) {
 			char ch = str.charAt(i);
-			int target = ch - 'a' + 1;
-			H = H + (long) ((target * Math.pow(r, i)) % M);
+			long target = ch - 'a' + 1;
+			long tmp = 1;
+			for (int j = 0; j < i; j++) {
+				tmp = tmp * r;
+				tmp = tmp % M;
+			}
+			H = H + target * tmp;
+			H = H % M;
 		}
 		
 		bw.write(String.valueOf(H));
